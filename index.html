@@ -12,7 +12,7 @@
 <body>
   <h1>수면 분석 챗봇</h1>
   <div id="chat"></div>
-  <button onclick="nextStep()">다음</button>
+  <button id="nextBtn">다음</button>
   <div id="result"></div>
 
   <script>
@@ -20,6 +20,7 @@
     const answers = {};
     const chat = document.getElementById("chat");
     const result = document.getElementById("result");
+    const nextBtn = document.getElementById("nextBtn");
 
     const questions = [
       "1. 몇 시에 잠자리에 들었습니까? (예: 23:00)",
@@ -32,6 +33,7 @@
       const prevInput = document.querySelector("#chat input");
       if (prevInput && prevInput.value) {
         answers[`q${step}`] = prevInput.value.trim();
+        step++;
       }
 
       if (step < questions.length) {
@@ -39,8 +41,9 @@
           <label>${questions[step]}</label><br>
           <input type="text" id="inputStep${step}" />
         `;
-        step++;
       } else {
+        chat.innerHTML = "";
+        nextBtn.disabled = true;
         analyzeSleep();
       }
     }
@@ -88,6 +91,7 @@
 
     // 초기 질문 표시
     nextStep();
+    nextBtn.addEventListener("click", nextStep);
   </script>
 </body>
 </html>
