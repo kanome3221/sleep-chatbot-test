@@ -7,11 +7,13 @@
     body { font-family: sans-serif; margin: 2rem; }
     input, button { padding: 0.5rem; font-size: 1rem; margin: 0.25rem 0; }
     #result { margin-top: 1rem; padding: 1rem; border: 1px solid #ccc; }
+    #error { color: red; margin-top: 0.5rem; }
   </style>
 </head>
 <body>
   <h1>수면 분석 챗봇</h1>
   <div id="chat"></div>
+  <div id="error"></div>
   <button id="nextBtn">다음</button>
   <div id="result"></div>
 
@@ -20,6 +22,7 @@
     const answers = {};
     const chat = document.getElementById("chat");
     const result = document.getElementById("result");
+    const errorDiv = document.getElementById("error");
     const nextBtn = document.getElementById("nextBtn");
 
     const questions = [
@@ -31,10 +34,28 @@
 
     function nextStep() {
       const prevInput = document.querySelector("#chat input");
-      if (prevInput && prevInput.value) {
-        answers[`q${step}`] = prevInput.value.trim();
-        step++;
+      const value = prevInput ? prevInput.value.trim() : "";
+      errorDiv.textContent = "";
+
+      if (!value) {
+        errorDiv.textContent = "⚠️ 값을 입력해주세요.";
+        return;
       }
+
+      if (step === 0 || step === 1) {
+        if (!/^\d{1,2}:\d{2}$/.test(value)) {
+          errorDiv.textContent = "⚠️ 시간을 hh:mm 형식으로 입력해주세요.";
+          return;
+        }
+      } else if (step === 2 || step === 3) {
+        if (isNaN(value) || Number(value) < 0) {
+          errorDiv.textContent = "⚠️ 숫자로 입력해주세요.";
+          return;
+        }
+      }
+
+      answers[`q${step}`] = value;
+      step++;
 
       if (step < questions.length) {
         chat.innerHTML = `
