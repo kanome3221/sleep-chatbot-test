@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>수면 분석 챗봇</title>
   <style>
     body {
@@ -45,6 +46,7 @@
       border-radius: 6px;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
     }
     button:disabled {
       background-color: #999;
@@ -63,6 +65,19 @@
     }
     #result li {
       margin-bottom: 0.5rem;
+    }
+    @media (max-width: 600px) {
+      body {
+        margin: 1rem;
+      }
+      h1 {
+        font-size: 1.2rem;
+        padding: 0.8rem;
+      }
+      input, button {
+        font-size: 1rem;
+        padding: 0.8rem;
+      }
     }
   </style>
 </head>
