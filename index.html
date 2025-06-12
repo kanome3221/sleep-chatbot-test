@@ -22,42 +22,32 @@
       resultElement.textContent = "분석 중...";
 
       try {
-        const response = await fetch("/api/gpt", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message })
-        });
+        // 실제 API 호출 대신 mock 응답 처리
+        const data = {
+          result: {
+            summary: "수면 시간이 일정하지 않고 중간에 자주 깨어 수면의 질이 낮습니다.",
+            issues: [
+              "수면 시간이 들쑥날쑥합니다.",
+              "새벽에 자주 깹니다.",
+              "잠들기까지 시간이 오래 걸립니다."
+            ],
+            suggestions: [
+              "매일 같은 시간에 잠자리에 들도록 노력해보세요.",
+              "취침 1시간 전에는 스마트폰, TV 등을 멀리하세요.",
+              "수면 일기를 작성해 자신의 패턴을 기록해보세요."
+            ]
+          }
+        };
 
-        const data = await response.json();
-
-        if (data.raw) {
-          resultElement.innerHTML = `
-            <strong>GPT 전체 응답 (raw):</strong><br>
-            <pre style="white-space: pre-wrap; word-break: break-word;">
-${JSON.stringify(data.raw, null, 2)}
-            </pre>
-          `;
-          return;
-        }
-
-        if (data.result) {
-          const { summary, issues, suggestions } = data.result;
-          resultElement.innerHTML = `
-            <strong>📝 요약:</strong> ${summary}<br>
-            <strong>⚠️ 문제점:</strong> <ul>${issues.map(i => `<li>${i}</li>`).join("")}</ul>
-            <strong>💡 솔루션:</strong> <ul>${suggestions.map(s => `<li>${s}</li>`).join("")}</ul>
-          `;
-        } else if (data.reply) {
-          resultElement.innerHTML = `
-            <strong>GPT 응답 (원문):</strong><br>${data.reply}<br><br>
-            ⚠️ GPT가 JSON 형식으로 응답하지 않았습니다.
-          `;
-        } else {
-          throw new Error("분석 결과 없음");
-        }
+        const { summary, issues, suggestions } = data.result;
+        resultElement.innerHTML = `
+          <strong>📝 요약:</strong> ${summary}<br>
+          <strong>⚠️ 문제점:</strong> <ul>${issues.map(i => `<li>${i}</li>`).join("")}</ul>
+          <strong>💡 솔루션:</strong> <ul>${suggestions.map(s => `<li>${s}</li>`).join("")}</ul>
+        `;
       } catch (error) {
         console.error("분석 실패:", error);
-        resultElement.textContent = "분석에 실패했습니다. 오류: " + error.message;
+        resultElement.textContent = "분석에 실패했습니다.";
       }
     }
   </script>
