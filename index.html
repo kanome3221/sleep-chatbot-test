@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>수면 분석 챗봇</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    textarea { width: 100%; height: 100px; }
+    #result { margin-top: 1rem; padding: 1rem; border: 1px solid #ccc; }
+  </style>
+</head>
+<body>
+  <h1>수면 분석 챗봇</h1>
+  <textarea id="message" placeholder="최근 수면 습관을 입력해 주세요..."></textarea>
+  <button onclick="sendMessage()">분석 요청</button>
+  <div id="result">분석 결과가 여기에 표시됩니다.</div>
+
+  <script>
+    async function sendMessage() {
+      const message = document.getElementById("message").value;
+      const resultElement = document.getElementById("result");
+      resultElement.textContent = "분석 중...";
+
+      try {
+        const response = await fetch("/api/gpt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+
+        if (data.raw) {
+          resultElement.innerHTML = `
+            <strong>GPT 전체 응답 (raw):</strong><br>
+            <pre style="white-space: pre-wrap; word-break: break-word;">
+${JSON.stringify(data.raw, null, 2)}
+            </pre>
+          `;
+          return;
+        }
+
+        if (data.result) {
+          const { summary, issues, suggestions } = data.result;
+          resultElement.innerHTML = `
+            <strong>📝 요약:</strong> ${summary}<br>
+            <strong>⚠️ 문제점:</strong> <ul>${issues.map(i => `<li>${i}</li>`).join("")}</ul>
+            <strong>💡 솔루션:</strong> <ul>${suggestions.map(s => `<li>${s}</li>`).join("")}</ul>
+          `;
+        } else if (data.reply) {
+          resultElement.innerHTML = `
+            <strong>GPT 응답 (원문):</strong><br>${data.reply}<br><br>
+            ⚠️ GPT가 JSON 형식으로 응답하지 않았습니다.
+          `;
+        } else {
+          throw new Error("분석 결과 없음");
+        }
+      } catch (error) {
+        console.error("분석 실패:", error);
+        resultElement.textContent = "분석에 실패했습니다. 오류: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
